@@ -1,0 +1,9 @@
+FROM golang:1.24-alpine
+
+WORKDIR /app
+COPY . .
+
+RUN go mod init backend && go get && go build -o server main.go
+
+EXPOSE 8080
+CMD ["./server"]
