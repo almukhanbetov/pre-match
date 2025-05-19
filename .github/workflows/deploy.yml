@@ -18,11 +18,28 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
 
-    - name: 🚀 Деплой на VPS
+    - name: 🚀 Деплой на VPS с логированием
       run: |
         ssh -tt -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} << 'EOF'
-          cd /opt/prematch
-          git pull origin main
-          docker compose down
-          docker compose up --build -d
+          echo "[START] $(date)" >> /opt/prematch/deploy.log
+          
+          {
+            cd /opt/prematch || exit 1
+
+            echo "🌀 Pull latest changes"
+            git pull origin main
+
+            echo "🛑 Stopping containers"
+            docker compose down
+
+            echo "🔨 Building containers"
+            docker compose build
+
+            echo "🚀 Starting containers"
+            docker compose up -d
+
+            echo "✅ Deploy complete: $(date)"
+          } >> /opt/prematch/deploy.log 2>&1
+          
+          echo "[END] $(date)" >> /opt/prematch/deploy.log
         EOF
