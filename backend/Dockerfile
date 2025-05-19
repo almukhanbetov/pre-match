@@ -7,8 +7,9 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o server main.go
+RUN go mod tidy && go build -o server main.go
 
 EXPOSE 8888
 
 CMD ["./server"]
+
