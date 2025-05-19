@@ -21,7 +21,7 @@ jobs:
     - name: 🚀 Деплой на VPS
       run: |
         ssh -tt -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} << 'EOF'
-          cd /opt/your-app-folder
+          cd /opt/prematch
           git pull origin main
           docker compose down
           docker compose up --build -d
