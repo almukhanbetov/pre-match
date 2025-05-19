@@ -10,18 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: 📥 Checkout репозитория
       uses: actions/checkout@v3
 
-    - name: Setup SSH
+    - name: 🛡 Настройка SSH-доступа
       uses: webfactory/ssh-agent@v0.7.0
       with:
         ssh-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
 
-    - name: Deploy via SSH
+    - name: 🚀 Деплой на VPS
       run: |
-        ssh -o StrictHostKeyChecking=no root@your_vps_ip << 'EOF'
-          cd /opt/your-app
+        ssh -tt -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} << 'EOF'
+          cd /opt/your-app-folder
           git pull origin main
           docker compose down
           docker compose up --build -d
