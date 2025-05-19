@@ -41,7 +41,7 @@ jobs:
                       echo "✅ Deploy complete: $(date)"
                     } >> /opt/prematch/deploy.log 2>&1
 
-                    echo "[END] $(date)" >> /opt/prematch/deploy.log
+                    echo "[END] $(date)" >> /opt/pre-match/deploy.log
 
                     exit 0
                   EOF
