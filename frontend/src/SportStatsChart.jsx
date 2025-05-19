@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from './api'; // ✅ централизованный axios-инстанс
 import { Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -7,6 +7,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
+import { toast } from 'react-toastify'; // (опционально для уведомлений)
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -21,10 +22,11 @@ export default function SportStatsChart() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await axios.get('http://localhost:8080/sports/stats');
+        const res = await api.get('/sports/stats');
         setStats(res.data);
       } catch (err) {
         console.error('Ошибка загрузки статистики по видам спорта:', err);
+        toast.error('❌ Ошибка загрузки статистики');
       }
     }
     fetchStats();
@@ -45,7 +47,11 @@ export default function SportStatsChart() {
   return (
     <div className="mt-10 max-w-xl mx-auto text-center">
       <h2 className="text-xl font-bold mb-4">📊 Статистика по видам спорта</h2>
-      <Pie data={chartData} />
+      {stats.length > 0 ? (
+        <Pie data={chartData} />
+      ) : (
+        <p className="text-gray-400">Нет данных для отображения</p>
+      )}
     </div>
   );
 }

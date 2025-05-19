@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from './api'; // ✅ подключаем централизованный API
 import sportIcon from './sportIcon';
+import { toast } from 'react-toastify'; // для уведомлений об ошибках
 
 export default function Sidebar({ selected, onSelect }) {
   const [sports, setSports] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/sports')
+    api.get('/sports')
       .then(res => setSports(res.data))
-      .catch(err => console.error('Ошибка загрузки видов спорта:', err));
+      .catch(err => {
+        console.error('❌ Ошибка загрузки видов спорта:', err);
+        toast.error('❌ Ошибка загрузки видов спорта');
+      });
   }, []);
 
   return (

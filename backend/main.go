@@ -275,6 +275,6 @@ func main() {
 	router.GET("/sports/stats", getSportStats)
 	router.GET("/cache/clear", clearCache)
 
-	log.Println("🚀 Сервер запущен на http://localhost:8080")
+	log.Println("🚀 Сервер запущен на http://localhost:8888")
 	router.Run(":8888")
 }

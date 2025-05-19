@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import axios from 'axios';
+import api from './api';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns';
@@ -25,17 +25,17 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const prevScores = useRef({});
 
-  // 🔁 Только при смене вида спорта
   useEffect(() => {
     let timer;
 
     async function fetchGames() {
+      <ToastContainer />
       setLoading(true);
       try {
         const url = selectedSport
-          ? `http://localhost:8080/games?sport=${encodeURIComponent(selectedSport)}`
-          : 'http://localhost:8080/games';
-        const res = await axios.get(url);
+          ? `/games?sport=${encodeURIComponent(selectedSport)}`
+          : '/games';
+        const res = await api.get(url);
 
         res.data.forEach(game => {
           if (game.time_status === 'live') {
@@ -50,13 +50,14 @@ export default function App() {
         setGames(res.data);
       } catch (err) {
         console.error('Ошибка загрузки матчей:', err);
+        toast.error('❌ Ошибка загрузки матчей');
       } finally {
         setLoading(false);
       }
     }
 
     fetchGames();
-    timer = setInterval(fetchGames, 30000); // автообновление только на смену спорта
+    timer = setInterval(fetchGames, 30000);
     return () => clearInterval(timer);
   }, [selectedSport]);
 
@@ -68,7 +69,6 @@ export default function App() {
     localStorage.setItem('favorites', JSON.stringify(updated));
   };
 
-  // 🧠 useMemo для фильтрации и сортировки
   const filteredSortedGames = useMemo(() => {
     const filtered = games.filter(g => {
       const matchStatus =

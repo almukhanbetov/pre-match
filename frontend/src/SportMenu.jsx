@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from './api'; // ✅ централизованный API
+import { toast } from 'react-toastify'; // (опционально для ошибок)
 
 export default function SportMenu({ onSelect }) {
   const [sports, setSports] = useState([]);
@@ -7,12 +8,14 @@ export default function SportMenu({ onSelect }) {
   useEffect(() => {
     async function fetchSports() {
       try {
-        const res = await axios.get('http://localhost:8080/sports');
+        const res = await api.get('/sports');
         setSports(res.data);
       } catch (err) {
-        console.error('Ошибка загрузки видов спорта:', err);
+        console.error('❌ Ошибка загрузки видов спорта:', err);
+        toast.error('Ошибка загрузки видов спорта');
       }
     }
+
     fetchSports();
   }, []);
 
@@ -25,7 +28,9 @@ export default function SportMenu({ onSelect }) {
       >
         <option value="">Все</option>
         {sports.sort().map((sport, i) => (
-          <option key={i} value={sport}>{sport}</option>
+          <option key={i} value={sport}>
+            {sport}
+          </option>
         ))}
       </select>
     </div>
