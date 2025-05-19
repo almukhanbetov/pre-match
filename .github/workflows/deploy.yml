@@ -1,48 +1,34 @@
-name: Deploy to VPS
-
+name: 🚀 Deploy to VPS
 on:
   push:
     branches:
       - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: 📥 Checkout репозитория
-      uses: actions/checkout@v3
+      - name: 📥 Checkout кода
+        uses: actions/checkout@v3
 
-    - name: 🛡 Настройка SSH-доступа
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
+      - name: 🔐 Установка SSH-ключа
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
 
-    - name: 🚀 Деплой на VPS с логированием
-      run: |
-                ssh -tt -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} << 'EOF'
-                    echo "[START] $(date)" >> /opt/prematch/deploy.log
-                    
-                    {
-                      cd /opt/prematch || exit 1
+      - name: 🚀 Подключение и деплой на VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            echo "🔄 Переход в папку"
+            cd /opt/pre-match || exit 1
 
-                      echo "🌀 Pull latest changes"
-                      git pull origin main
+            echo "📦 Обновление кода"
+            git pull origin main
 
-                      echo "🛑 Stopping containers"
-                      docker compose down
+            echo "📦 Пересборка контейнеров"
+            docker-compose build
 
-                      echo "🔨 Building containers"
-                      docker compose build
+            echo "🚀 Перезапуск"
+            docker-compose up -d
 
-                      echo "🚀 Starting containers"
-                      docker compose up -d
-
-                      echo "✅ Deploy complete: $(date)"
-                    } >> /opt/prematch/deploy.log 2>&1
-
-                    echo "[END] $(date)" >> /opt/pre-match/deploy.log
-
-                    exit 0
-                  EOF
-
+            echo "✅ Деплой завершён: $(date)"
+          EOF
